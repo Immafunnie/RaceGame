@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Racing Game</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #e0e0e0;
+        }
+        #gameArea {
+            position: relative;
+            width: 300px;
+            height: 600px;
+            background: #fff;
+            overflow: hidden;
+            border: 2px solid #333;
+            margin: auto;
+        }
+        #car {
+            position: absolute;
+            width: 50px;
+            height: 100px;
+            background: red;
+            bottom: 10px;
+            left: 125px;
+        }
+        .obstacle {
+            position: absolute;
+            width: 50px;
+            height: 100px;
+            background: green;
+            top: -100px;
+            left: 50px;
+            animation: moveDown 3s linear infinite;
+        }
+        @keyframes moveDown {
+            100% {
+                top: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameArea">
+        <div id="car"></div>
+        <div class="obstacle"></div>
+        <div class="obstacle"></div>
+    </div>
+    <script>
+        const car = document.getElementById('car');
+        const obstacles = document.querySelectorAll('.obstacle');
+        let isGameOver = false;
+
+        document.addEventListener('keydown', (e) => {
+            if (!isGameOver) {
+                switch (e.key) {
+                    case 'ArrowLeft':
+                        moveCar(-10);
+                        break;
+                    case 'ArrowRight':
+                        moveCar(10);
+                        break;
+                }
+            }
+        });
+
+        function moveCar(direction) {
+            const carPosition = car.offsetLeft;
+            const newCarPosition = carPosition + direction;
+            if (newCarPosition >= 0 && newCarPosition <= 250) {
+                car.style.left = newCarPosition + 'px';
+            }
+        }
+
+        setInterval(() => {
+            if (!isGameOver) {
+                obstacles.forEach(obstacle => {
+                    const obstaclePosition = obstacle.offsetTop;
+                    if (obstaclePosition > 600) {
+                        obstacle.style.top = '-100px';
+                        obstacle.style.left = Math.random() * 250 + 'px';
+                    } else {
+                        obstacle.style.top = obstaclePosition + 10 + 'px';
+                    }
+                    checkCollision(obstacle);
+                });
+            }
+        }, 100);
+
+        function checkCollision(obstacle) {
+            const carRect = car.getBoundingClientRect();
+            const obstacleRect = obstacle.getBoundingClientRect();
+            if (
+                carRect.x < obstacleRect.x + obstacleRect.width &&
+                carRect.x + carRect.width > obstacleRect.x &&
+                carRect.y < obstacleRect.y + obstacleRect.height &&
+                carRect.y + carRect.height > obstacleRect.y
+            ) {
+                alert('Game Over!');
+                isGameOver = true;
+            }
+        }
+    </script>
+</body>
+</html>
